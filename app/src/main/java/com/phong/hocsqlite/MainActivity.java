@@ -2,10 +2,15 @@ package com.phong.hocsqlite;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.Toast;
+
+import com.phong.model.Contact;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -16,12 +21,42 @@ public class MainActivity extends AppCompatActivity {
     String DATABASE_NAME = "dbContact.db";
     String DB_PATH_SUFFIX = "/databases/";
     SQLiteDatabase database = null;
+    ListView lvContact;
+    ArrayAdapter<Contact> adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         processCopy();
+        addControls();
+        hienThiToanBoSanPham();
+    }
+
+    private void hienThiToanBoSanPham() {
+        //mở hoặc tạo csdl
+        database = openOrCreateDatabase(DATABASE_NAME,MODE_PRIVATE,null);
+        //Cursor cursor = database.rawQuery("SELECT * FROM Contact",null);
+        //Cursor cursor = database.query("Contact", null, "Ma >= ?", new String[]{"3"}, null, null, null);
+        //Cursor cursor = database.query("Contact", null, "Ma = ? or Ma = ?", new String[]{"1","4"}, null, null, null);
+        Cursor cursor = database.query("Contact", null, null, null, null, null, null);
+        adapter.clear();
+        while (cursor.moveToNext()){
+            int ma = cursor.getInt(0);
+            String ten = cursor.getString(1);
+            String phone = cursor.getString(2);
+            Contact contact = new Contact(ma,ten,phone);
+            adapter.add(contact);
+        }
+        cursor.close();
+    }
+
+    private void addControls() {
+        lvContact = findViewById(R.id.lvContact);
+        adapter = new ArrayAdapter<Contact>(
+                MainActivity.this,
+                android.R.layout.simple_list_item_1);
+        lvContact.setAdapter(adapter);
     }
 
     private void processCopy(){//Sao chép csdl từ folder assets vào hệ thống điện thoại
