@@ -1,11 +1,15 @@
 package com.phong.hocsqlite;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -18,9 +22,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 public class MainActivity extends AppCompatActivity {
-    String DATABASE_NAME = "dbContact.db";
+    public static String DATABASE_NAME = "dbContact.db";
     String DB_PATH_SUFFIX = "/databases/";
-    SQLiteDatabase database = null;
+    public static SQLiteDatabase database = null;
     ListView lvContact;
     ArrayAdapter<Contact> adapter;
 
@@ -30,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         processCopy();
         addControls();
-        hienThiToanBoSanPham();
+        //hienThiToanBoSanPham();
     }
 
     private void hienThiToanBoSanPham() {
@@ -101,5 +105,27 @@ public class MainActivity extends AppCompatActivity {
         catch (Exception ex){
             Log.e("Lỗi",ex.toString());
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        //nạp menu lên:
+        getMenuInflater().inflate(R.menu.menu_main,menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.mnuThem){
+            Intent intent = new Intent(MainActivity.this,ThemContactActivity.class);
+            startActivity(intent);
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        hienThiToanBoSanPham();
     }
 }
