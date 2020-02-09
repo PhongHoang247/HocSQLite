@@ -8,8 +8,11 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -28,13 +31,32 @@ public class MainActivity extends AppCompatActivity {
     ListView lvContact;
     ArrayAdapter<Contact> adapter;
 
+    public static Contact selectedContact;//dùng dể lấy đối tượng chọn trên listview
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         processCopy();
         addControls();
+        addEvents();
         //hienThiToanBoSanPham();
+    }
+
+    private void addEvents() {
+        lvContact.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                selectedContact  = adapter.getItem(i);
+            }
+        });
+        lvContact.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                selectedContact = adapter.getItem(i);
+                return false;
+            }
+        });
     }
 
     private void hienThiToanBoSanPham() {
@@ -61,6 +83,8 @@ public class MainActivity extends AppCompatActivity {
                 MainActivity.this,
                 android.R.layout.simple_list_item_1);
         lvContact.setAdapter(adapter);
+        //Đăng ký ContextMenu cho listview:
+        registerForContextMenu(lvContact);
     }
 
     private void processCopy(){//Sao chép csdl từ folder assets vào hệ thống điện thoại
@@ -127,5 +151,24 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         hienThiToanBoSanPham();
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        getMenuInflater().inflate(R.menu.context_menu,menu);
+    }
+
+    @Override
+    public boolean onContextItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.mnuEdit){
+            if (selectedContact != null){
+                {
+                    Intent intent = new Intent(MainActivity.this,SuaContactActivity.class);
+                    startActivity(intent);
+                }
+            }
+        }
+        return super.onContextItemSelected(item);
     }
 }
