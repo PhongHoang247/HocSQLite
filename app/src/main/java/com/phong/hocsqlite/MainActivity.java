@@ -1,8 +1,10 @@
 package com.phong.hocsqlite;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -169,6 +171,39 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
+        else if (item.getItemId() == R.id.mnuXoa){
+            if (selectedContact != null){
+                xuLyXoa();
+            }
+        }
         return super.onContextItemSelected(item);
+    }
+
+    private void xuLyXoa() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder.setTitle("Xác nhận xoá");
+        builder.setMessage("Bạn có chắc chắn muốn xoá?: \n" + selectedContact);
+        builder.setIcon(android.R.drawable.ic_dialog_alert);
+        builder.setPositiveButton("Có", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                int kq = database.delete("Contact","Ma = ?",new String[]{selectedContact.getMa() + ""});
+                if (kq > 0){
+                    hienThiToanBoSanPham();
+                }
+                else
+                {
+                    Toast.makeText(MainActivity.this,"Xoá thất bại",Toast.LENGTH_LONG).show();
+                }
+                dialogInterface.dismiss();
+            }
+        });
+        builder.setNegativeButton("Không", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+            }
+        });
+        builder.create().show();
     }
 }
